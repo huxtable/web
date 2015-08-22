@@ -8,6 +8,21 @@ namespace Huxtable\Web;
 class Request
 {
 	/**
+	 * @param	string	$name	Name of argument
+	 */
+	public function getArgument( $name )
+	{
+		$arguments = array_merge( $_GET, $_POST );
+
+		if( isset( $arguments[ $name ] ) )
+		{
+			return $arguments[ $name ];
+		}
+
+		return false;
+	}
+
+	/**
 	 * @return	void
 	 */
 	public function getMethod()
