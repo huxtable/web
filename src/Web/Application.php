@@ -13,6 +13,16 @@ class Application
 	public $routes=[];
 
 	/**
+	 * Shorthand method for registering DELETE routes
+	 * @return	Huxtable\Web\Response
+	 */
+	public function delete( $pattern, $closure )
+	{
+		$route = new Route( $pattern, $closure );
+		return $this->registerRoute( $route, 'DELETE' );
+	}
+
+	/**
 	 * Shorthand method for registering GET routes
 	 * @return	Huxtable\Web\Response
 	 */
