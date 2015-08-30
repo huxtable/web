@@ -133,6 +133,14 @@ class Response
 	}
 
 	/**
+	 * @return	int
+	 */
+	public function getStatusCode()
+	{
+		return $this->statusCode;
+	}
+
+	/**
 	 * @return	void
 	 */
 	public function sendHeaders()
