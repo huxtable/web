@@ -51,9 +51,9 @@ class Application
 	{
 		$pattern = $route->getPattern();
 
-		$this->routes[ $httpMethod ][ $pattern ] = $route;
+		$this->routes[ $pattern ][ $httpMethod ] = $route;
 
-		return $this->routes[ $httpMethod ][ $pattern ];
+		return $this->routes[ $pattern ][ $httpMethod ];
 	}
 
 	/**
@@ -62,76 +62,94 @@ class Application
 	 */
 	public function route( Request $request )
 	{
+		$url = $request->getURL();
 		$method = $request->getMethod();
 
-		if( isset( $this->routes[ $method ] ) )
+		// Default response
+		$response = new Response;
+		$response->setStatusCode( 404 );
+		$response->setContents( 'Not Found :(' );
+
+		if( isset( $this->routes[ $url ] ) )
 		{
-			$routes = $this->routes[ $method ];
+			$routes = $this->routes[ $url ];
 
-			foreach( $routes as $routePattern => $routeObject )
+			// Route pattern + method match found
+			if( isset( $this->routes[ $url ][ $method ] ) )
 			{
-				if( $routePattern == $request->getURL() )
-				{
-					$routeObject->setRequest( $request );
+				$routeObject = $this->routes[ $url ][ $method ];
+				$routeObject->setRequest( $request );
 
-					foreach( $routeObject->getRequiredHeaders() as $header )
+				// Confirm required headers were sent
+				foreach( $routeObject->getRequiredHeaders() as $header )
+				{
+					if( $request->getHeader( $header ) === false )
 					{
-						if( $request->getHeader( $header ) === false )
+
+						$response->setStatusCode( 400 );
+						$response->setContents( 'Bad Request :(' );
+
+						return $response;
+					}
+				}
+
+				// Confirm required arguments were passed
+				foreach( $routeObject->getRequiredArguments() as $argument )
+				{
+					if( $request->getArgument( $argument ) === false )
+					{
+						$response = new Response;
+						$response->setStatusCode( 400 );
+
+						return $response;
+					}
+				}
+
+				// Call the pre-route closure if defined
+				$preRouteClosure = $routeObject->getPreRouteClosure();
+
+				try
+				{
+					if( $preRouteClosure != false )
+					{
+						call_user_func( $preRouteClosure );
+
+						// If pre-routing has moved response into error territory, bail
+						if( $routeObject->response->getStatusCode() >= 400 )
 						{
-							$response = new Response;
-							$response->setStatusCode( 400 );
-					
-							return $response;
+							return $routeObject->response;
 						}
 					}
 
-					foreach( $routeObject->getRequiredArguments() as $argument )
-					{
-						if( $request->getArgument( $argument ) === false )
-						{
-							$response = new Response;
-							$response->setStatusCode( 400 );
-
-							return $response;
-						}
-					}
-
-					$routeObject->response->setContents( call_user_func( $routeObject->getClosure() ) );
-					return $routeObject->response;
+					// Call the main routing closure
+					$contents = call_user_func( $routeObject->getClosure() );
 				}
-			}
-		}
-
-		$response = new Response;
-		$response->setStatusCode( 404 );
-		$response->setContents( 'Not Found' );
-
-		return $response;
-
-
-
-		return;
-		foreach( $this->routes as $pattern => $routeProperties )
-		{
-			if( $request->getMethod() == strtoupper( $routeProperties['method'] ) )
-			{
-				// @todo	Implement actual pattern matching
-				if( $pattern == $request->getURL() )
+				catch( \Exception $e )
 				{
-					$route = $routeProperties['route'];
-					$route->setRequest( $request );
-
-
-
-					$route->response->setContents( call_user_func( $route->getClosure() ) );
-					return $route->response;
+					// @todo	Implement exception handling :)
 				}
-			}
-		}
 
-		$response = new Response;
-		$response->setStatusCode( 404 );
-		$response->setContents( 'Not Found' );
+				// Automatically format contents based on Content-Type
+				switch( $routeObject->response->getContentType() )
+				{
+					case 'application/json':
+
+						if( strlen( $contents ) > 0 )
+						{
+							$contents = json_encode( $contents );
+						}
+
+						break;
+				}
+
+				$routeObject->response->setContents( $contents );
+				return $routeObject->response;
+			}
+
+			// No route pattern + method match found
+			$response->setStatusCode( 405 );
+			$response->setContents( 'Method Not Allowed :(' );
+		}
 
 		return $response;
 	}
