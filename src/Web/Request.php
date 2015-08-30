@@ -23,6 +23,14 @@ class Request
 	}
 
 	/**
+	 * @return	string
+	 */
+	public function getHost()
+	{
+		return $this->getHeader( 'HOST' );
+	}
+
+	/**
 	 * @return	void
 	 */
 	public function getMethod()
@@ -46,6 +54,14 @@ class Request
 		}
 
 		return false;
+	}
+
+	/**
+	 * @return	string
+	 */
+	public function getProtocol()
+	{
+		return strtolower( substr( $this->getServerVariable( 'SERVER_PROTOCOL' ) , 0, strpos( $this->getServerVariable( 'SERVER_PROTOCOL' ), '/' ) ) ) .'://';
 	}
 
 	/**
