@@ -8,7 +8,12 @@ namespace Huxtable\Web;
 class Route
 {
 	/**
-	 * @var mixed
+	 * @var Closure
+	 */
+	protected $authenticationClosure;
+
+	/**
+	 * @var Closure
 	 */
 	protected $closure;
 
@@ -66,6 +71,19 @@ class Route
 	}
 
 	/**
+	 * @return	\Closure|false
+	 */
+	public function getAuthenticationClosure()
+	{
+		if( $this->authenticationClosure instanceof \Closure )
+		{
+			return $this->authenticationClosure;
+		}
+
+		return false;
+	}
+
+	/**
 	 * @return	array
 	 */
 	public function getRequiredArguments()
@@ -88,6 +106,20 @@ class Route
 	public function requireArgument( $name )
 	{
 		$this->requiredArguments[] = $name;
+		return $this;
+	}
+
+	/**
+	 * @param	mixed	$closure
+	 * @return	self	For chaining
+	 */
+	public function requireAuthentication( $closure )
+	{
+		if($closure instanceof \Closure)
+		{
+			$this->authenticationClosure = $closure->bindTo($this);
+		}
+
 		return $this;
 	}
 
