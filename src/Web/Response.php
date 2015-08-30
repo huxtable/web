@@ -13,11 +13,6 @@ class Response
 	protected $contents='';
 
 	/**
-	 * @var string
-	 */
-	protected $contentType='text/html';
-
-	/**
 	 * @var array
 	 */
 	protected $headers=[];
@@ -118,6 +113,15 @@ class Response
 	public function getContents()
 	{
 		return $this->contents;
+	}
+
+	/**
+	 * @return	string
+	 */
+	public function getContentType()
+	{
+		$contentType = isset( $this->headers[ 'Content-Type' ] ) ? $this->headers[ 'Content-Type' ] : 'text/html';
+		return $contentType;
 	}
 
 	/**
