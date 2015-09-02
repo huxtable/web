@@ -43,6 +43,16 @@ class Application
 	}
 
 	/**
+	 * Shorthand method for registering PUT routes
+	 * @return	Huxtable\Web\Response
+	 */
+	public function put( $pattern, $closure )
+	{
+		$route = new Route( $pattern, $closure );
+		return $this->registerRoute( $route, 'PUT' );
+	}
+
+	/**
 	 * @param	Huxtable\Web\Route		$route
 	 * @param	string					$httpMethod
 	 * @return	Huxtable\Web\Route		A reference to the Route object, for chaining
