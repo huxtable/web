@@ -131,6 +131,7 @@ class Application
 					{
 						$response = new Response;
 						$response->setStatusCode( 400 );
+						$response->setContents( "Missing required argument '{$argument}'" );
 
 						return $response;
 					}
