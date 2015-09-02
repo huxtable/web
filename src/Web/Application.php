@@ -90,6 +90,27 @@ class Application
 				$routeObject = $this->routes[ $url ][ $method ];
 				$routeObject->setRequest( $request );
 
+				// Call authenticatiion callback if defined
+				$authenticationClosure = $routeObject->getAuthenticationClosure();
+
+				if( $authenticationClosure != false )
+				{
+					try
+					{
+						call_user_func( $authenticationClosure );
+
+						// If pre-routing has moved response into error territory, bail
+						if( $routeObject->response->getStatusCode() >= 400 )
+						{
+							return $routeObject->response;
+						}
+					}
+					catch( \Exception $e )
+					{
+						// @todo	Implement exception handling :)
+					}
+				}
+
 				// Confirm required headers were sent
 				foreach( $routeObject->getRequiredHeaders() as $header )
 				{
@@ -115,22 +136,8 @@ class Application
 					}
 				}
 
-				// Call the pre-route closure if defined
-				$preRouteClosure = $routeObject->getPreRouteClosure();
-
 				try
 				{
-					if( $preRouteClosure != false )
-					{
-						call_user_func( $preRouteClosure );
-
-						// If pre-routing has moved response into error territory, bail
-						if( $routeObject->response->getStatusCode() >= 400 )
-						{
-							return $routeObject->response;
-						}
-					}
-
 					// Call the main routing closure
 					$contents = call_user_func( $routeObject->getClosure() );
 				}
