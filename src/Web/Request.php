@@ -23,6 +23,14 @@ class Request
 	}
 
 	/**
+	 * @return	array
+	 */
+	public function getArguments()
+	{
+		return array_merge( $_GET, $_POST );
+	}
+
+	/**
 	 * @return	string
 	 */
 	public function getHost()
