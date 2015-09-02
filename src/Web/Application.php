@@ -152,7 +152,7 @@ class Application
 				{
 					case 'application/json':
 
-						if( strlen( $contents ) > 0 )
+						if( !is_null( $contents ) > 0 )
 						{
 							$contents = json_encode( $contents );
 						}
