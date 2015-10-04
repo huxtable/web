@@ -144,7 +144,11 @@ class Application
 				}
 				catch( \Exception $e )
 				{
-					// @todo	Implement exception handling :)
+					$response = new Response;
+					$response->setStatusCode( 500 );
+					$response->setContents( $e->getMessage() );
+
+					return $response;
 				}
 
 				// Automatically format contents based on Content-Type
