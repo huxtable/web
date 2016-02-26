@@ -141,6 +141,14 @@ class Response
 	}
 
 	/**
+	 * @return	int
+	 */
+	public function getStatusMessage()
+	{
+		return $this->statuses[ $this->statusCode ];
+	}
+
+	/**
 	 * @return	void
 	 */
 	public function sendHeaders()

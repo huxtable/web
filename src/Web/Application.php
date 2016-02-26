@@ -98,16 +98,12 @@ class Application
 					try
 					{
 						call_user_func( $authenticationClosure );
-
-						// If pre-routing has moved response into error territory, bail
-						if( $routeObject->response->getStatusCode() >= 400 )
-						{
-							return $routeObject->response;
-						}
 					}
-					catch( \Exception $e )
+					catch( Request\UnauthorizedRequestException $e )
 					{
-						// @todo	Implement exception handling :)
+						$routeObject->response->setStatusCode( 401 );
+						$routeObject->response->setContents( $routeObject->response->getStatusMessage() );
+						return $routeObject->response;
 					}
 				}
 
@@ -116,9 +112,8 @@ class Application
 				{
 					if( $request->getHeader( $header ) === false )
 					{
-
 						$response->setStatusCode( 400 );
-						$response->setContents( 'Bad Request :(' );
+						$response->setContents( $routeObject->response->getContents() );
 
 						return $response;
 					}
@@ -149,19 +144,6 @@ class Application
 					$response->setContents( $e->getMessage() );
 
 					return $response;
-				}
-
-				// Automatically format contents based on Content-Type
-				switch( $routeObject->response->getContentType() )
-				{
-					case 'application/json':
-
-						if( !is_null( $contents ) > 0 )
-						{
-							$contents = json_encode( $contents );
-						}
-
-						break;
 				}
 
 				$routeObject->response->setContents( $contents );
