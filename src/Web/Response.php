@@ -112,6 +112,11 @@ class Response
 	 */
 	public function getContents()
 	{
+		if( $this->getContentType() == 'application/json' )
+		{
+			return json_encode( $this->contents );
+		}
+
 		return $this->contents;
 	}
 
