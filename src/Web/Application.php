@@ -99,7 +99,7 @@ class Application
 					{
 						call_user_func( $authenticationClosure );
 					}
-					catch( Request\UnauthorizedRequestException $e )
+					catch( Request\UnauthorizedException $e )
 					{
 						$routeObject->response->setStatusCode( 401 );
 						$routeObject->response->setContents( $routeObject->response->getStatusMessage() );
