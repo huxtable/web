@@ -82,7 +82,7 @@ class Request
 		{
 			return $_SERVER[ $varname ];
 		}
-		
+
 		return false;
 	}
 
@@ -91,7 +91,7 @@ class Request
 	 */
 	public function getURL()
 	{
-		return $this->getServerVariable( 'PHP_SELF' );
+		return $this->getServerVariable( 'REQUEST_URI' );
 	}
 
 	/**
