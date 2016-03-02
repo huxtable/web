@@ -91,7 +91,18 @@ class Request
 	 */
 	public function getURL()
 	{
-		return $this->getServerVariable( 'REQUEST_URI' );
+		$url = $this->getServerVariable( 'REQUEST_URI' );
+
+		$urlLen = strlen( $url );
+		$urlPosLastSlash = strrpos( $url, '/' );
+
+		// Strip trailing slash
+		if( $urlPosLastSlash == ($urlLen - 1) )
+		{
+			$url = substr( $url, 0, ($urlLen - 1) );
+		}
+
+		return $url;
 	}
 
 	/**
