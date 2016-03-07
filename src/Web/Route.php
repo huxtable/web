@@ -5,6 +5,8 @@
  */
 namespace Huxtable\Web;
 
+use Huxtable\Core\FileInfo;
+
 class Route
 {
 	/**
@@ -41,6 +43,11 @@ class Route
 	 * @var Huxtable\Web\Response
 	 */
 	public $response;
+
+	/**
+	 * @var	Huxtable\Core\FileInfo
+	 */
+	protected $sourceFile;
 
 	/**
 	 * @param	string	$pattern	URL pattern to match
@@ -130,6 +137,23 @@ class Route
 	public function requireHeader( $name )
 	{
 		$this->requiredHeaders[] = $name;
+		return $this;
+	}
+
+	/**
+	 * @param	Huxtable\Core\FileInfo	$file
+	 * @return	self	For chaining
+	 */
+	public function returnFileContents( FileInfo $sourceFile )
+	{
+		$this->sourceFile = $sourceFile;
+
+		$closure = function()
+		{
+			return $this->sourceFile->getContents();
+		};
+
+		$this->closure = $closure->bindTo( $this );
 		return $this;
 	}
 
