@@ -93,13 +93,17 @@ class Request
 	{
 		$url = $this->getServerVariable( 'REQUEST_URI' );
 
+		// Strip trailing slash
 		$urlLen = strlen( $url );
 		$urlPosLastSlash = strrpos( $url, '/' );
 
-		// Strip trailing slash
-		if( $urlPosLastSlash == ($urlLen - 1) )
+		// ...but only if it's not the *entire* URL
+		if( $urlLen > 1 )
 		{
-			$url = substr( $url, 0, ($urlLen - 1) );
+			if( $urlPosLastSlash == ($urlLen - 1) )
+			{
+				$url = substr( $url, 0, ($urlLen - 1) );
+			}
 		}
 
 		return $url;
@@ -113,5 +117,3 @@ class Request
 		return $this->getServerVariable( 'HTTP_USER_AGENT' );
 	}
 }
-
-?>
