@@ -5,23 +5,24 @@
  */
 namespace Huxtable\Web;
 
-use \Huxtable\Core\FileInfo;
+use Huxtable\Core\File;
 
 class Router
 {
 	/**
-	 * @param
+	 * @param	Huxtable\Core\File\Directory	$dirRoutes
 	 * @return	void
 	 */
-	public function __construct( FileInfo $dirRoutes )
+	public function __construct( File\Directory $dirRoutes )
 	{
 		$this->dirRoutes = $dirRoutes;
 	}
 
 	/**
+	 * @param	Huxtable\Core\File\Directory	$dirRoutes
 	 * @return	array
 	 */
-	public function getRoutes( FileInfo $dirRoutes=null )
+	public function getRoutes( File\Directory $dirRoutes=null )
 	{
 		$routes = [];
 
@@ -30,13 +31,13 @@ class Router
 			$dirRoutes = $this->dirRoutes;
 		}
 
-		$routeFiles = $dirRoutes->children( ['.DS_Store'] );
+		$routeFiles = $dirRoutes->children();
 
 		foreach( $routeFiles as $routeFile )
 		{
 			if( $routeFile->isDir() )
 			{
-				// Descent into subfolders
+				// Descend into subfolders
 				$routes = array_merge( $routes, $this->getRoutes( $routeFile ) );
 			}
 			else
